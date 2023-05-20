@@ -1,0 +1,14 @@
+<!DOCTYPE HTML>
+
+<html>
+    <head>
+        <title>HTML Parser</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename= 'css/style.css') }}">
+    </head>
+
+    <form method="POST" action="/parse">
+        <label for="url">Enter a url: </label>
+        <input name=url_input type="url" id="url">
+        <button name="submit_btn" type="submit"> Submit </button>
+    </form>
+</html>

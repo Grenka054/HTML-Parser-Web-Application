@@ -1,0 +1,13 @@
+form {
+    color: black;
+    text-align: center;
+    padding: 10px;
+}
+
+button {
+    color: black;
+    border: 2px #eee solid;
+    text-align: center;
+    margin: 0 auto;
+    display: block;
+}
