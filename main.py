@@ -1,12 +1,13 @@
-from flask import Flask, render_template,request,send_file
+import logger
 import requests
-import parser
-import logging
+from flask import Flask, render_template, request, send_file
+
+import html_parser
 
 app = Flask(__name__)
 
-@app.route("/")
 
+@app.route("/")
 @app.route("/index")
 def index():
     return render_template('index.html')
@@ -14,7 +15,7 @@ def index():
 
 @app.route("/download")
 def download():
-    return send_file('result.csv',as_attachment=True)
+    return send_file('result.csv', as_attachment=True)
 
 
 @app.route("/parse", methods=['POST'])
@@ -23,10 +24,23 @@ def parse():
         if request.method == 'POST':
             url = request.form["url_input"]
 
-            parser.parse()
+            html_parser.parse(url)
 
             return download()
 
-    except requests.exceptions.MissingSchema: 
-        app.logger.error("url is empty")
+    except requests.exceptions.MissingSchema:
+        app.logger.error("Url is empty")
+        return index()
+
+    except html_parser.BadResponse:
+        app.logger.error("Bad response")
+        return index()
+
+    except html_parser.WrongWebsite:
+        app.logger.error("The data was not found")
+        return index()
+
+    except html_parser.ParserError:
+        app.logger.error(
+            "Internal parser error. The site may have been updated")
         return index()

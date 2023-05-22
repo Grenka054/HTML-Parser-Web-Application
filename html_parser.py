@@ -5,6 +5,18 @@ from bs4 import BeautifulSoup
 from pandas import DataFrame, concat
 
 
+class BadResponse(Exception):
+    pass
+
+
+class WrongWebsite(Exception):
+    pass
+
+
+class ParserError(Exception):
+    pass
+
+
 def format_text(text: str, new_lines: bool = True):
     """
     Убрать из текста (если нужно) переносы строк и повторяющиеся пробелы.
@@ -77,19 +89,25 @@ def parse_page(response: requests) -> DataFrame:
     return df_data
 
 
-def parse():
+def parse(url):
     """
     Парсер с пагинацией
     """
-    url = "https://mi-shop.com/ru/catalog/smartphones/"
+    if not url.startswith("https://mi-shop.com/ru/catalog/smartphones"):
+        raise WrongWebsite()
     response = requests.get(url)
     df_main_list = []
     # пагинация
-    page = 1
+    # page = 1
     if response.status_code == 200:
-        df = parse_page(response)
-        df_main_list.append(df)
-        url_page = url + f"page/{page}/"
-        response = requests.get(url_page)
+        try:
+            df = parse_page(response)
+            df_main_list.append(df)
+        except:
+            raise ParserError("Internal parser error")
+            # url_page = url + f"page/{page}/"
+            # response = requests.get(url)
+    else:
+        raise BadResponse(response.status_code)
     df_main = concat(df_main_list)
     df_main.to_csv('result.csv', index=False)
